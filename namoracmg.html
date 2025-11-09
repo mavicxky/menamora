@@ -1,0 +1,144 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Quer namorar comigo?</title>
+  <style>
+    :root{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+    html,body{height:100%;margin:0;padding:0;overflow-x:hidden}
+    body{
+      display:flex;align-items:center;justify-content:center;min-height:100%;
+      background-color:#ffeef6;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22800%22 viewBox=%220 0 800 800%22><defs><pattern id=%22p%22 x=%220%22 y=%220%22 width=%22160%22 height=%22160%22 patternUnits=%22userSpaceOnUse%22><g transform=%22scale(.8)%22><circle cx=%2230%22 cy=%2230%22 r=%2228%22 fill=%22%23ffd6e8%22/><circle cx=%2230%22 cy=%2230%22 r=%2212%22 fill=%22%23ff9ac1%22/><circle cx=%22110%22 cy=%22110%22 r=%2228%22 fill=%22%23fff0d6%22/><circle cx=%22110%22 cy=%22110%22 r=%2212%22 fill=%22%23ffd28a%22/></g></pattern></defs><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23fff5fb%22/><rect width=%22100%25%22 height=%22100%25%22 fill=%22url(%23p)%22 opacity=%220.95%22/></svg>');
+      background-size:320px 320px;
+      transition:background 0.4s ease;
+    }
+    .card{
+      background:rgba(255,255,255,0.85);
+      backdrop-filter:blur(6px);
+      border-radius:18px;padding:34px 28px;max-width:680px;width:92%;
+      box-shadow:0 8px 30px rgba(0,0,0,0.12);
+      text-align:center;position:relative;
+    }
+    h1{margin:0 0 14px;font-size:34px;color:#3b2a3a}
+    p.lead{margin:0 0 22px;color:#6b4d60}
+    .buttons{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:center;position:relative}
+    button{
+      padding:12px 26px;border-radius:12px;border:0;font-size:18px;cursor:pointer;user-select:none;box-shadow:0 6px 18px rgba(59,42,58,0.12);
+      transition:transform .12s ease,box-shadow .12s ease;min-width:100px
+    }
+    button:active{transform:translateY(1px)}
+    .sim{background:linear-gradient(135deg,#ff8fb1,#ff5a9b);color:white}
+    .nao{background:linear-gradient(135deg,#ffd6a6,#ffb66a);color:#4b2b18;position:absolute}
+    .hint{font-size:13px;color:#8a6b7a;margin-top:12px}
+    .full-love{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(180deg,#fff3f8,#ffeef2);padding:20px;text-align:center}
+    .faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(40px,1fr));gap:8px;width:90%;max-width:900px;margin:18px auto 0;align-items:center;justify-items:center}
+    .face{font-size:30px;animation:bounce .9s infinite ease-in-out}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .big-msg{font-size:48px;color:#75294b;margin-top:18px;font-weight:700}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:#1f1f1f;color:white;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:100}
+    .toast.show{opacity:1}
+    @media (max-width:520px){
+      h1{font-size:28px}
+      .big-msg{font-size:34px}
+      button{font-size:16px;padding:10px 18px}
+      .card{padding:26px 20px}
+      .faces{grid-template-columns:repeat(auto-fit,minmax(30px,1fr))}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="dialog" aria-labelledby="pergunta">
+    <h1 id="pergunta">Quer namorar comigo?</h1>
+    <div class="buttons">
+      <button class="sim" id="btnSim">Sim</button>
+      <button class="nao" id="btnNao">Não</button>
+    </div>
+    <p class="hint">(Tenta apertar o “Não” 👀)</p>
+  </div>
+
+  <div class="full-love" id="fullLove" aria-hidden="true">
+    <div class="big-msg">EU TE AMO GATINHA 💘</div>
+    <div class="faces" id="faces"></div>
+  </div>
+
+  <script>
+    const btnNao=document.getElementById('btnNao');
+    const btnSim=document.getElementById('btnSim');
+    const fullLove=document.getElementById('fullLove');
+    const faces=document.getElementById('faces');
+
+    btnNao.addEventListener('touchstart',()=>{showToast('Essa opção não vale');moveNaoRandom();});
+    btnNao.addEventListener('mousemove',()=>moveNaoRandom());
+    btnNao.addEventListener('click',e=>{e.preventDefault();showToast('Essa opção não vale');moveNaoRandom();});
+
+    function moveNaoRandom(){
+      const card=document.querySelector('.card');
+      const cardRect=card.getBoundingClientRect();
+      const btn=btnNao;
+      const btnRect=btn.getBoundingClientRect();
+      const padding=20;
+      const maxLeft=cardRect.width-btnRect.width-padding;
+      const maxTop=cardRect.height-btnRect.height-padding;
+      const left=Math.random()*maxLeft;
+      const top=Math.random()*maxTop;
+      btn.style.left=left+'px';
+      btn.style.top=top+'px';
+    }
+
+    let toastTimer=null;
+    function showToast(msg){
+      clearTimeout(toastTimer);
+      toast.textContent=msg;
+      toast.classList.add('show');
+      toastTimer=setTimeout(()=>toast.classList.remove('show'),1800);
+    }
+
+    btnSim.addEventListener('click',()=>{
+      document.body.style.background='linear-gradient(180deg,#fff6f9,#ffeef2)';
+      faces.innerHTML='';
+      const emojis=['😊','😍','🥰','😄','😁','🤩','😘','😇'];
+      for(let i=0;i<100;i++){
+        const s=document.createElement('div');
+        s.className='face';
+        s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        faces.appendChild(s);
+      }
+      fullLove.style.display='flex';
+      fullLove.setAttribute('aria-hidden','false');
+      showConfettiText();
+    });
+
+    function showConfettiText(){
+      const conf=document.createElement('div');
+      conf.style.position='fixed';conf.style.inset='0';conf.style.pointerEvents='none';conf.style.display='grid';conf.style.gridTemplateColumns='repeat(auto-fit,30px)';conf.style.alignContent='start';conf.style.paddingTop='40px';
+      const pieces=['✨','💘','🎉','🌸','💫'];
+      for(let i=0;i<60;i++){
+        const el=document.createElement('div');
+        el.textContent=pieces[Math.floor(Math.random()*pieces.length)];
+        el.style.fontSize=(12+Math.floor(Math.random()*22))+'px';
+        el.style.opacity=Math.random()*0.95;
+        conf.appendChild(el);
+      }
+      document.body.appendChild(conf);
+      setTimeout(()=>conf.remove(),2400);
+    }
+
+    window.addEventListener('load',()=>{
+      btnNao.style.right='28px';
+      btnNao.style.top='120px';
+    });
+  </script>
+</body>
+</html>
+    </body>
+    </html>
